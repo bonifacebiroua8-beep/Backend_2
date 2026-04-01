@@ -7,7 +7,7 @@ from loguru import logger
 from app.core.dependencies import get_db, get_current_user
 from app.models.utilisateur import Utilisateur
 from app.models.transcription import TranscriptionVocale
-from app.schemas import TranscriptionOut
+#from app.schemas import TranscriptionOut
 from app.services.vocal_service import VocalService
 from app.utils.responses import ok
 from app.core.config import settings
@@ -15,7 +15,7 @@ from app.core.config import settings
 router = APIRouter(prefix="/vocal", tags=["Vocal"])
 
 
-@router.post("/transcrire", response_model=TranscriptionOut, status_code=201)
+@router.post("/transcrire",  status_code=201)
 async def transcrire(
     audio: UploadFile = File(...),
     id_boutique: int = Form(...),

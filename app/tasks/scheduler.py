@@ -95,11 +95,12 @@ def nettoyer_sessions():
         db = SessionLocal()
         try:
             nb = db.query(SessionAuth).filter(
-                SessionAuth.date_expiration < datetime.utcnow()
+                SessionAuth.date_expiration < datetime.utcnow(),
+                SessionAuth.actif == True
             ).update({"actif": False})
             db.commit()
             if nb > 0:
-                logger.debug(f"Sessions expirées: {nb}")
+                logger.debug(f"Sessions expirées nettoyées: {nb}")
         finally:
             db.close()
     except Exception as e:
@@ -114,7 +115,6 @@ def supprimer_exports():
         from app.models.export import ExportGenere
         db = SessionLocal()
         try:
-            seuil = datetime.utcnow() - timedelta(days=7)
             exports = db.query(ExportGenere).filter(
                 ExportGenere.date_expiration < datetime.utcnow(),
                 ExportGenere.statut == "termine"
@@ -195,16 +195,17 @@ def calculer_metriques_quotidiennes():
 
 def demarrer_scheduler():
     if scheduler.running:
+        logger.warning("⚠️ Scheduler déjà actif — ignoré (worker dupliqué détecté)")
         return
-    scheduler.add_job(recalculer_scores,        CronTrigger(hour=2,  minute=0),  id="scores")
-    scheduler.add_job(envoyer_rappels_echeances, CronTrigger(hour=8,  minute=0),  id="rappels")
-    scheduler.add_job(marquer_echeances_retard,  CronTrigger(hour=0,  minute=30), id="retards")
-    scheduler.add_job(nettoyer_sessions,         CronTrigger(minute=0),           id="sessions")
-    scheduler.add_job(supprimer_exports,         CronTrigger(hour=3,  minute=0),  id="exports")
-    scheduler.add_job(calculer_metriques_quotidiennes, CronTrigger(hour=23, minute=50), id="metriques")
-    scheduler.add_job(reset_compteurs_freemium,  CronTrigger(day=1, hour=0, minute=5), id="freemium")
+    scheduler.add_job(recalculer_scores,             CronTrigger(hour=2,  minute=0),       id="scores",    replace_existing=True)
+    scheduler.add_job(envoyer_rappels_echeances,     CronTrigger(hour=8,  minute=0),       id="rappels",   replace_existing=True)
+    scheduler.add_job(marquer_echeances_retard,      CronTrigger(hour=0,  minute=30),      id="retards",   replace_existing=True)
+    scheduler.add_job(nettoyer_sessions,             CronTrigger(minute=0),                id="sessions",  replace_existing=True)
+    scheduler.add_job(supprimer_exports,             CronTrigger(hour=3,  minute=0),       id="exports",   replace_existing=True)
+    scheduler.add_job(calculer_metriques_quotidiennes, CronTrigger(hour=23, minute=50),    id="metriques", replace_existing=True)
+    scheduler.add_job(reset_compteurs_freemium,      CronTrigger(day=1, hour=0, minute=5), id="freemium",  replace_existing=True)
     scheduler.start()
-    logger.info("✅ Scheduler UbuntuTech démarré — 7 tâches planifiées")
+    logger.info("✅ Scheduler démarré — 7 tâches planifiées (Africa/Douala)")
 
 
 def arreter_scheduler():

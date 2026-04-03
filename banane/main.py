@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
         try:
             import app.models  # noqa — enregistre tous les modèles auprès de Base
             from app.core.database import Base, engine
-            Base.metadata.create_all(bind=engine)
+            Base.metadata.create_all(bind=engine, checkfirst=True)
             logger.info("✅ Tables vérifiées / créées")
         except Exception as e:
             logger.error(f"❌ Erreur create_all: {e}")

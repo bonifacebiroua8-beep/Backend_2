@@ -468,3 +468,14 @@ class NotificationOut(BaseModel):
     date_creation: datetime
     class Config:
         from_attributes = True
+
+class TranscriptionOut(BaseModel):
+    id_transcription: int
+    texte_transcrit: str
+    langue_detectee: str
+    confiance_whisper: Optional[float] = None
+    action_detectee: Optional[str] = None
+    entites_extraites: Optional[dict] = None
+    message_confirmation: Optional[str] = None
+    class Config:
+        from_attributes = True

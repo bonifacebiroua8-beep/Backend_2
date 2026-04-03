@@ -36,6 +36,13 @@ async def lifespan(app: FastAPI):
 
     if check_db_connection():
         logger.info(f"✅ MySQL '{settings.DB_NAME}' connecté")
+        try:
+            import app.models  # noqa — enregistre tous les modèles auprès de Base
+            from app.core.database import Base, engine
+            Base.metadata.create_all(bind=engine)
+            logger.info("✅ Tables vérifiées / créées")
+        except Exception as e:
+            logger.error(f"❌ Erreur create_all: {e}")
     else:
         logger.critical("❌ MySQL non accessible — vérifiez .env")
 
@@ -64,11 +71,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Rate limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Middlewares
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
@@ -120,15 +125,12 @@ async def not_found(request: Request, exc):
     return JSONResponse(status_code=404, content={"success": False, "message": f"Route introuvable: {request.url.path}"})
 
 
-# Fichiers statiques
 if os.path.exists(settings.UPLOAD_DIR):
     app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 
-# Routes API
 app.include_router(api_router)
 
 
-# Endpoints santé
 @app.get("/", include_in_schema=False)
 def root():
     return {

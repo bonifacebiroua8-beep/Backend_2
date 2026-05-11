@@ -1,6 +1,6 @@
 # app/core/config.py
 # ============================================================
-#  UBUNTUTECH — Configuration centralisée v2.0
+#  UBUNTUTECH — Configuration centralisée v3.0
 # ============================================================
 from pydantic_settings import BaseSettings
 from functools import lru_cache
@@ -19,20 +19,24 @@ class Settings(BaseSettings):
     # ── Base de données ──────────────────────────────────────
     DB_HOST: str         = "localhost"
     DB_PORT: int         = 3306
-    DB_NAME: str         = "ubuntutech"
-    DB_USER: str         = "root"
-    DB_PASSWORD: str     = "password"
-    DB_POOL_SIZE: int    = 15
-    DB_MAX_OVERFLOW: int = 30
-    DB_POOL_RECYCLE: int = 3600
+    DB_NAME: str         = "defaultdb"
+    DB_USER: str         = "avnadmin"
+    DB_PASSWORD: str     = ""
+    DB_SSL: bool         = True
+    DB_POOL_SIZE: int    = 5
+    DB_MAX_OVERFLOW: int = 10
+    DB_POOL_RECYCLE: int = 1800
 
     @property
     def DATABASE_URL(self) -> str:
-        return (
+        url = (
             f"mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
             f"?charset=utf8mb4"
         )
+        if self.DB_SSL:
+            url += "&ssl_ca=/etc/ssl/certs/ca-certificates.crt"
+        return url
 
     # ── JWT ──────────────────────────────────────────────────
     JWT_SECRET_KEY: str                  = "change_me_jwt_secret"
@@ -48,11 +52,8 @@ class Settings(BaseSettings):
     GROQ_TIMEOUT: int       = 45
 
     # ── Whisper ──────────────────────────────────────────────
-    # BUG B FIX — whisper-large-v3 nécessite ~10GB RAM (crash sur Railway)
-    # "base" = 74MB RAM, suffisant pour FR/FF/HA en production
-    # Pour améliorer la précision sur Fulfuldé/Haoussa : utiliser "small" (244MB)
-    WHISPER_MODEL: str     = "tiny"
-    MAX_AUDIO_SIZE_MB: int = 25   # augmenté de 10 → 25 pour enregistrements 5 min
+    WHISPER_MODEL: str     = "small"
+    MAX_AUDIO_SIZE_MB: int = 25
 
     # ── Twilio ───────────────────────────────────────────────
     TWILIO_ACCOUNT_SID:  str = ""
@@ -101,6 +102,5 @@ settings = get_settings()
 
 
 def ensure_dirs():
-    """Crée les répertoires nécessaires au démarrage."""
     for d in [settings.UPLOAD_DIR, settings.EXPORT_DIR, settings.LOG_DIR]:
         os.makedirs(d, exist_ok=True)

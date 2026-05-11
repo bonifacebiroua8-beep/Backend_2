@@ -1,9 +1,13 @@
-# app/core/database.py — UbuntuTech v3.0
+# app/core/database.py — UbuntuTech v3.0 — Aiven SSL
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from loguru import logger
 from app.core.config import settings
+
+connect_args = {}
+if settings.DB_SSL:
+    connect_args["ssl"] = {"ssl_mode": "REQUIRED"}
 
 engine = create_engine(
     settings.DATABASE_URL,
@@ -11,6 +15,7 @@ engine = create_engine(
     max_overflow=settings.DB_MAX_OVERFLOW,
     pool_recycle=settings.DB_POOL_RECYCLE,
     pool_pre_ping=True,
+    connect_args=connect_args,
     echo=False
 )
 

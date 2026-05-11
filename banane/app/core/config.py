@@ -78,9 +78,9 @@ class Settings(BaseSettings):
         return [o.strip() for o in self.CORS_ORIGINS.split(",")]
 
     # ── Chemins ──────────────────────────────────────────────
-    UPLOAD_DIR: str  = "./uploads_temp"
-    EXPORT_DIR: str  = "./exports"
-    LOG_DIR: str     = "./logs"
+    UPLOAD_DIR: str  = "/tmp/uploads_temp"
+    EXPORT_DIR: str  = "/tmp/exports"
+    LOG_DIR: str     = "/tmp/logs"
     LOG_LEVEL: str   = "INFO"
 
     # ── Rate limiting ─────────────────────────────────────────

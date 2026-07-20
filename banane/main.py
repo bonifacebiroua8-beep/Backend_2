@@ -1,4 +1,4 @@
-# main.py — UbuntuTech Backend v3.0
+# main.py — UbuntuTech Backend v1.0
 # ============================================================
 #  Lancer : uvicorn main:app --host 0.0.0.0 --port $PORT
 # ============================================================

@@ -1,4 +1,4 @@
-# app/core/database.py — UbuntuTech v3.0 — Aiven SSL
+# app/core/database.py — UbuntuTech v1.0 — Aiven SSL
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker

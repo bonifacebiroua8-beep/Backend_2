@@ -1,4 +1,4 @@
-# app/api/router.py — UbuntuTech v3.0
+# app/api/router.py — UbuntuTech v1.0
 from fastapi import APIRouter
 from app.api.routes import (
     auth, boutiques, utilisateurs, produits, ventes,

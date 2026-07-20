@@ -1,4 +1,4 @@
-# app/services/auth_service.py — UbuntuTech v3.0
+# app/services/auth_service.py — UbuntuTech v1.0
 import random, string
 from datetime import datetime, timedelta
 from typing import Optional
